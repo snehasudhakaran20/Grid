@@ -98,7 +98,17 @@
     <div id="grid1" class="grid"></div>
     <div id="grid2" class="grid"></div>
 </div>
-<button id="run">Run Algorithm</button>
+<div>
+    <label for="algorithmSelect">Choose Algorithm:</label>
+    <select id="algorithmSelect">
+        <option value="gaussian_blur">Gaussian Blur</option>
+        <option value="amaze">AMAZE</option>
+        <option value="ppg">PPG</option>
+        <option value="vng">VNG</option>
+        <option value="edge_detect">Edge Detect</option>
+    </select>
+    <button id="run">Run Algorithm</button>
+</div>
 <div>
     <button id="resetGrid1" class="small-icon">Reset 1</button>
     <button id="resetGrid2" class="small-icon">Reset 2</button>
