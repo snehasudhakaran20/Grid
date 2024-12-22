@@ -33,19 +33,19 @@ def same_values(r,g,b):
 
 def amaze(grid):
     # Placeholder: Replace with actual AMAZE logic
-    return [f"{int(r)//2},{int(g)//2},{int(b)//2}" for r, g, b in (rgb.split(",") for rgb in grid)]
+    return [f"{int(0)//2},{int(g)//2},{int(b)//2}" for r, g, b in (rgb.split(",") for rgb in grid)]
 
 def ppg(grid):
     # Placeholder: Replace with actual PPG logic
-    return [f"{int(r)*2%256},{int(g)*2%256},{int(b)*2%256}" for r, g, b in (rgb.split(",") for rgb in grid)]
+    return [f"{int(r)*2%256},{int(0)*2%256},{int(b)*2%256}" for r, g, b in (rgb.split(",") for rgb in grid)]
 
 def vng(grid):
     # Placeholder: Replace with actual VNG logic
-    return [f"{255-int(r)},{int(g)},{int(b)}" for r, g, b in (rgb.split(",") for rgb in grid)]
+    return [f"{255-int(r)},{int(g)},{int(0)}" for r, g, b in (rgb.split(",") for rgb in grid)]
 
 def edge_detect(grid):
     # Placeholder: Replace with actual Edge Detection logic
-    return [f"{max(0, int(r)-50)},{max(0, int(g)-50)},{max(0, int(b)-50)}" for r, g, b in (rgb.split(",") for rgb in grid)]
+    return [f"{max(0, int(0)-50)},{max(0, int(0)-50)},{max(0, int(0)-50)}" for r, g, b in (rgb.split(",") for rgb in grid)]
 
 @app.route('/run_algorithm', methods=['POST'])
 def run_algorithm():
