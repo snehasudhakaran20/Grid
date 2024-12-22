@@ -1,84 +1,102 @@
-// Function to initialize a 10x10 grid with empty values
-function initializeGrid() {
-    const grid = [];
-    for (let i = 0; i < 10; i++) {
-        const row = [];
-        for (let j = 0; j < 10; j++) {
-            row.push({ red: null, green: null, blue: null }); // Empty values
-        }
-        grid.push(row);
-    }
-    return grid;
-}
+const grid1 = document.getElementById('grid1');
+const grid2 = document.getElementById('grid2');
+const resetButton = document.getElementById('reset');
+const runButton = document.getElementById('run');
 
-// Render the grid in the table on the webpage
-function renderGrid(grid) {
-    const table = document.getElementById('gridTable');
-    table.innerHTML = ''; // Clear existing content
+let selectedSquare = null;
 
-    grid.forEach((row, rowIndex) => {
-        const tr = document.createElement('tr');
-        row.forEach((cell, colIndex) => {
-            const td = document.createElement('td');
-            td.classList.add('grid-cell');
-            td.setAttribute('data-row', rowIndex);
-            td.setAttribute('data-col', colIndex);
-            td.innerHTML = `
-                <input type="number" placeholder="R" data-color="red" value="${cell.red ?? ''}">
-                <input type="number" placeholder="G" data-color="green" value="${cell.green ?? ''}">
-                <input type="number" placeholder="B" data-color="blue" value="${cell.blue ?? ''}">
-            `;
-            tr.appendChild(td);
-        });
-        table.appendChild(tr);
+function createDropdown(square) {
+    const dropdown = document.createElement('div');
+    dropdown.className = 'dropdown';
+    dropdown.innerHTML = `
+        <label>R: <select data-color="r">
+            <option value="0">0</option>
+            <option value="127">127</option>
+            <option value="255">255</option>
+        </select></label><br>
+        <label>G: <select data-color="g">
+            <option value="0">0</option>
+            <option value="127">127</option>
+            <option value="255">255</option>
+        </select></label><br>
+        <label>B: <select data-color="b">
+            <option value="0">0</option>
+            <option value="127">127</option>
+            <option value="255">255</option>
+        </select></label><br>
+    `;
+
+    dropdown.addEventListener('change', () => {
+        const r = dropdown.querySelector('[data-color="r"]').value;
+        const g = dropdown.querySelector('[data-color="g"]').value;
+        const b = dropdown.querySelector('[data-color="b"]').value;
+        square.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        square.dataset.rgb = `${r},${g},${b}`;
     });
+
+    return dropdown;
 }
 
-// Collect grid values from the inputs
-function getGridFromInputs() {
-    const grid = [];
-    const rows = document.querySelectorAll('#gridTable tr');
-    rows.forEach((row, rowIndex) => {
-        const cells = row.querySelectorAll('td');
-        const gridRow = [];
-        cells.forEach(cell => {
-            const red = cell.querySelector('[data-color="red"]').value || null;
-            const green = cell.querySelector('[data-color="green"]').value || null;
-            const blue = cell.querySelector('[data-color="blue"]').value || null;
-            gridRow.push({
-                red: red ? parseInt(red) : null,
-                green: green ? parseInt(green) : null,
-                blue: blue ? parseInt(blue) : null
+function createGrid(container, isOutput = false) {
+    for (let i = 0; i < 100; i++) {
+        const square = document.createElement('div');
+        square.className = 'square';
+
+        if (!isOutput) {
+            square.addEventListener('click', (e) => {
+                e.stopPropagation();
+
+                if (selectedSquare && selectedSquare !== square) {
+                    selectedSquare.querySelector('.dropdown').style.display = 'none';
+                }
+
+                if (!square.querySelector('.dropdown')) {
+                    const dropdown = createDropdown(square);
+                    square.appendChild(dropdown);
+                }
+
+                square.querySelector('.dropdown').style.display = 'block';
+                selectedSquare = square;
             });
-        });
-        grid.push(gridRow);
-    });
-    return grid;
-}
 
-// Send grid to Python API and update the table with new values
-async function processGrid() {
-    const grid = getGridFromInputs();
-    try {
-        const response = await fetch('https://demosaicing-math.onrender.com/api/process-grid', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ grid })
-        });
-        const result = await response.json();
-        renderGrid(result.grid); // Update the grid with new values
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to process grid. Please try again.');
+            square.dataset.rgb = "255,255,255";
+        }
+
+        container.appendChild(square);
     }
 }
 
-// Initialize the grid on page load
-document.addEventListener('DOMContentLoaded', () => {
-    const grid = initializeGrid();
-    renderGrid(grid);
-
-    // Set up the process button
-    const processButton = document.getElementById('processButton');
-    processButton.addEventListener('click', processGrid);
+document.addEventListener('click', (e) => {
+    if (selectedSquare && (!selectedSquare.contains(e.target) && !e.target.closest('.dropdown'))) {
+        selectedSquare.querySelector('.dropdown').style.display = 'none';
+        selectedSquare = null;
+    }
 });
+
+resetButton.addEventListener('click', () => {
+    document.querySelectorAll('#grid1 .square').forEach(square => {
+        square.style.backgroundColor = 'white';
+        square.dataset.rgb = "255,255,255";
+    });
+});
+
+runButton.addEventListener('click', async () => {
+    const gridValues = Array.from(document.querySelectorAll('#grid1 .square')).map(square => square.dataset.rgb);
+
+    const response = await fetch('/run_algorithm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grid: gridValues })
+    });
+
+    const result = await response.json();
+    const updatedGridValues = result.grid;
+
+    const squares = document.querySelectorAll('#grid2 .square');
+    updatedGridValues.forEach((rgb, index) => {
+        squares[index].style.backgroundColor = `rgb(${rgb})`;
+    });
+});
+
+createGrid(grid1);
+createGrid(grid2, true);
