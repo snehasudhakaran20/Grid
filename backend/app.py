@@ -30,6 +30,19 @@ def same_values(r,g,b):
     return r1,b1,g1
 
 def gaussian_blur():
+    data = request.json
+    grid = data.get('grid', [])
+    
+    if not grid:
+        return jsonify({'error': 'Invalid grid data'}), 400
+
+    sigma=1
+    kernel=gaussian_kernel(10,sigma)
+    updated_grid=apply_gaussian_blur(grid,kernel)
+    
+    return jsonify({'grid': updated_grid})
+
+    
     
 
 if __name__ == '__main__':
