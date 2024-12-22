@@ -1,31 +1,18 @@
+document.getElementById('mathForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const inputData = document.getElementById('inputData').value;
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-color: #f4f4f4;
-}
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: inputData })
+    });
 
-h1 {
-  color: #333;
-}
-
-form {
-  margin: 20px 0;
-}
-
-input, button {
-  padding: 10px;
-  margin: 5px;
-  font-size: 16px;
-}
-
-#result {
-  margin-top: 20px;
-  font-weight: bold;
-}
+    const result = await response.json();
+    document.getElementById('result').innerText = `Result: ${result.output}`;
+  } catch (error) {
+    console.error('Error:', error);
+    document.getElementById('result').innerText = 'An error occurred.';
+  }
+});
