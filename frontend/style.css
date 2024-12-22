@@ -1,54 +1,40 @@
-
-
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+  margin: 20px;
 }
 
-h1 {
-    margin-top: 20px;
-    color: #333;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(9, 50px);
+  grid-template-rows: repeat(9, 50px);
+  gap: 5px;
+  margin-bottom: 20px;
 }
 
-table {
-    margin: 20px auto;
-    border-collapse: collapse;
-    background: #fff;
+.cell {
+  width: 50px;
+  height: 50px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.grid-cell {
-    border: 1px solid #ccc;
-    width: 70px;
-    height: 70px;
-    text-align: center;
-    vertical-align: middle;
+.cell.selected {
+  border: 2px dashed blue;
 }
 
-.grid-cell input {
-    width: 60px;
-    margin: 5px 0;
-    text-align: center;
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin: 20px 0;
-    cursor: pointer;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+.rgb-select {
+  display: none;
 }
 
-button:hover {
-    background-color: #0056b3;
-}
-
-button:active {
-    background-color: #003f7f;
+.controls.active .rgb-select {
+  display: inline-block;
 }
