@@ -1,129 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interactive RGB Grid</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-
-    .container {
-      display: flex;
-      gap: 50px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(9, 50px);
-      grid-template-rows: repeat(9, 50px);
-      gap: 5px;
-    }
-
-    .cell {
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #ccc;
-      cursor: pointer;
-    }
-
-    .cell select {
-      display: none;
-    }
-
-    .cell.active select {
-      display: inline;
-    }
-
-    .cell.active {
-      border: 2px solid #000;
-    }
-
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Grid</title>
+    <style>
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-gap: 0;
+        }
+        .square {
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border: 1px solid black;
+            position: relative;
+        }
+        .dropdown {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: white;
+            border: 1px solid black;
+            display: none;
+            z-index: 100;
+        }
+    </style>
 </head>
 <body>
-  <h1>Interactive RGB Grid</h1>
-  <div class="container">
-    <div id="original-grid" class="grid"></div>
-    <div id="updated-grid" class="grid"></div>
-  </div>
-  <button onclick="runAlgorithm()">Run Algorithm</button>
-  <button onclick="resetGrid()">Reset</button>
 
-  <script>
-    const gridSize = 9;
-    const originalGrid = document.getElementById("original-grid");
-    const updatedGrid = document.getElementById("updated-grid");
+<h1>Interactive Grid</h1>
+<div class="container">
+    <div id="grid1" class="grid"></div>
+    <div id="grid2" class="grid"></div>
+</div>
+<button id="reset">Reset Colors</button>
+<button id="run">Run Algorithm</button>
 
-    function createDropdown() {
-      const select = document.createElement("select");
-      for (let i = 0; i <= 255; i += 15) {
-        const option = document.createElement("option");
-        option.value = i;
-        option.textContent = i;
-        select.appendChild(option);
-      }
-      return select;
-    }
+<script>
+    const grid1 = document.getElementById('grid1');
+    const grid2 = document.getElementById('grid2');
+    const resetButton = document.getElementById('reset');
+    const runButton = document.getElementById('run');
 
-    function createGrid(container) {
-      for (let i = 0; i < gridSize * gridSize; i++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
+    let selectedSquare = null;
 
-        const red = createDropdown();
-        const green = createDropdown();
-        const blue = createDropdown();
+    function createDropdown(square) {
+        const dropdown = document.createElement('div');
+        dropdown.className = 'dropdown';
+        dropdown.innerHTML = `
+            <label>R: <select data-color="r">
+                <option value="0">0</option>
+                <option value="127">127</option>
+                <option value="255">255</option>
+            </select></label><br>
+            <label>G: <select data-color="g">
+                <option value="0">0</option>
+                <option value="127">127</option>
+                <option value="255">255</option>
+            </select></label><br>
+            <label>B: <select data-color="b">
+                <option value="0">0</option>
+                <option value="127">127</option>
+                <option value="255">255</option>
+            </select></label><br>
+        `;
 
-        cell.appendChild(red);
-        cell.appendChild(green);
-        cell.appendChild(blue);
-
-        cell.addEventListener('click', () => {
-          document.querySelectorAll('.cell').forEach(c => c.classList.remove('active'));
-          cell.classList.add('active');
+        dropdown.addEventListener('change', () => {
+            const r = dropdown.querySelector('[data-color="r"]').value;
+            const g = dropdown.querySelector('[data-color="g"]').value;
+            const b = dropdown.querySelector('[data-color="b"]').value;
+            square.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            square.dataset.rgb = `${r},${g},${b}`;
         });
 
-        container.appendChild(cell);
-      }
+        return dropdown;
     }
 
-    createGrid(originalGrid);
-    createGrid(updatedGrid);
+    function createGrid(container, isOutput = false) {
+        for (let i = 0; i < 100; i++) {
+            const square = document.createElement('div');
+            square.className = 'square';
 
-    function runAlgorithm() {
-      const originalCells = originalGrid.children;
-      const updatedCells = updatedGrid.children;
+            if (!isOutput) {
+                square.addEventListener('click', (e) => {
+                    e.stopPropagation();
 
-      for (let i = 0; i < originalCells.length; i++) {
-        const [red, green, blue] = originalCells[i].getElementsByTagName("select");
-        let r = parseInt(red.value);
-        let g = parseInt(green.value);
-        let b = parseInt(blue.value);
+                    if (selectedSquare && selectedSquare !== square) {
+                        selectedSquare.querySelector('.dropdown').style.display = 'none';
+                    }
 
-        r = Math.min(r + 30, 255);
-        g = Math.min(g + 30, 255);
-        b = Math.min(b + 30, 255);
+                    if (!square.querySelector('.dropdown')) {
+                        const dropdown = createDropdown(square);
+                        square.appendChild(dropdown);
+                    }
 
-        const updatedCell = updatedCells[i];
-        updatedCell.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-      }
+                    square.querySelector('.dropdown').style.display = 'block';
+                    selectedSquare = square;
+                });
+
+                square.dataset.rgb = "255,255,255";
+            }
+
+            container.appendChild(square);
+        }
     }
 
-    function resetGrid() {
-      document.querySelectorAll('.cell select').forEach(select => select.value = 0);
-      document.querySelectorAll('#updated-grid .cell').forEach(cell => cell.style.backgroundColor = '');
-    }
-  </script>
+    document.addEventListener('click', (e) => {
+        if (selectedSquare && (!selectedSquare.contains(e.target) && !e.target.closest('.dropdown'))) {
+            selectedSquare.querySelector('.dropdown').style.display = 'none';
+            selectedSquare = null;
+        }
+    });
+
+    resetButton.addEventListener('click', () => {
+        document.querySelectorAll('#grid1 .square').forEach(square => {
+            square.style.backgroundColor = 'white';
+            square.dataset.rgb = "255,255,255";
+        });
+    });
+
+    runButton.addEventListener('click', async () => {
+        const gridValues = Array.from(document.querySelectorAll('#grid1 .square')).map(square => square.dataset.rgb);
+
+        const response = await fetch('/run_algorithm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ grid: gridValues })
+        });
+
+        const result = await response.json();
+        const updatedGridValues = result.grid;
+
+        const squares = document.querySelectorAll('#grid2 .square');
+        updatedGridValues.forEach((rgb, index) => {
+            squares[index].style.backgroundColor = `rgb(${rgb})`;
+        });
+    });
+
+    createGrid(grid1);
+    createGrid(grid2, true);
+</script>
 </body>
 </html>
