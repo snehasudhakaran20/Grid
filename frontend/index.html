@@ -226,7 +226,7 @@
     runButton.addEventListener('click', async () => {
         const gridValues = Array.from(document.querySelectorAll('#grid1 .square')).map(square => square.dataset.rgb);
 
-        const response = await fetch('/run_algorithm', {
+        const response = await fetch('https://demosaicing-math.onrender.com/api/run_algorithm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ grid: gridValues })
