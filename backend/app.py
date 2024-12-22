@@ -1,8 +1,12 @@
+
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for cross-origin requests
 
-@app.route('/run_algorithm', methods=['POST'])
+
+@app.route('/api/run_algorithm', methods=['POST'])
 def run_algorithm():
     data = request.json
     grid = data.get('grid', [])
