@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive RGB Grid</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .container {
+      display: flex;
+      gap: 50px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(9, 50px);
+      grid-template-rows: repeat(9, 50px);
+      gap: 5px;
+    }
+
+    .cell {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .cell select {
+      display: none;
+      margin: 2px 0;
+    }
+
+    .cell.active select {
+      display: block;
+    }
+
+    .selected {
+      border: 2px dashed blue;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Interactive RGB Grid</h1>
+  <div class="container">
+    <div id="original-grid" class="grid"></div>
+    <div id="updated-grid" class="grid"></div>
+  </div>
+  <button onclick="runAlgorithm()">Run Algorithm</button>
+  <button onclick="resetGrid()">Reset</button>
+  <button onclick="copySelection()">Copy</button>
+  <button onclick="pasteSelection()">Paste</button>
+
+  <script>
+    const gridSize = 9;
+    const originalGrid = document.getElementById("original-grid");
+    const updatedGrid = document.getElementById("updated-grid");
+    let selectedCells = [];
+    let copiedValues = null;
+
+    function createDropdown(label) {
+      const wrapper = document.createElement("div");
+      const select = document.createElement("select");
+
+      [0, 31, 63, 127, 191, 255].forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = `${label}: ${value}`;
+        select.appendChild(option);
+      });
+
+      wrapper.appendChild(select);
+      return select;
+    }
+
+    function createGrid(container) {
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+
+        const red = createDropdown("R");
+        const green = createDropdown("G");
+        const blue = createDropdown("B");
+
+        cell.appendChild(red);
+        cell.appendChild(green);
+        cell.appendChild(blue);
+
+        cell.addEventListener("click", (e) => {
+          e.stopPropagation();
+          document.querySelectorAll(".cell").forEach(c => c.classList.remove("active"));
+          cell.classList.add("active");
+          showDropdowns(cell);
+        });
+
+        cell.addEventListener("change", () => {
+          updateCellColor(cell);
+        });
+
+        container.appendChild(cell);
+      }
+    }
+
+    function showDropdowns(cell) {
+      cell.querySelectorAll("select").forEach(select => select.style.display = "block");
+    }
+
+    function hideDropdowns() {
+      document.querySelectorAll(".cell select").forEach(select => select.style.display = "none");
+      document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("active"));
+    }
+
+    function updateCellColor(cell) {
+      const [red, green, blue] = cell.getElementsByTagName("select");
+      const r = parseInt(red.value);
+      const g = parseInt(green.value);
+      const b = parseInt(blue.value);
+      cell.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    }
+
+    createGrid(originalGrid);
+    createGrid(updatedGrid);
+
+    function runAlgorithm() {
+      const originalCells = originalGrid.children;
+      const updatedCells = updatedGrid.children;
+
+      for (let i = 0; i < originalCells.length; i++) {
+        const [red, green, blue] = originalCells[i].getElementsByTagName("select");
+        let r = parseInt(red.value);
+        let g = parseInt(green.value);
+        let b = parseInt(blue.value);
+
+        r = Math.min(r + 31, 255);
+        g = Math.min(g + 31, 255);
+        b = Math.min(b + 31, 255);
+
+        const updatedCell = updatedCells[i];
+        updatedCell.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+      }
+    }
+
+    function resetGrid() {
+      document.querySelectorAll(".cell select").forEach(select => select.value = 0);
+      document.querySelectorAll(".cell").forEach(cell => cell.style.backgroundColor = "");
+      selectedCells = [];
+    }
+
+    function copySelection() {
+      if (selectedCells.length > 0) {
+        const [red, green, blue] = selectedCells[0].getElementsByTagName("select");
+        copiedValues = [red.value, green.value, blue.value];
+      }
+    }
+
+    function pasteSelection() {
+      if (copiedValues) {
+        selectedCells.forEach(cell => {
+          const [red, green, blue] = cell.getElementsByTagName("select");
+          red.value = copiedValues[0];
+          green.value = copiedValues[1];
+          blue.value = copiedValues[2];
+          updateCellColor(cell);
+        });
+      }
+    }
+
+    // Hide dropdowns when clicking outside a cell
+    document.addEventListener("click", hideDropdowns);
+  </script>
+</body>
+</html>
