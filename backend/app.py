@@ -18,12 +18,19 @@ def run_algorithm():
     updated_grid = []
     for rgb in grid:
         r, g, b = map(int, rgb.split(','))
-        updated_r = r
-        updated_g = g
-        updated_b = b
+        {updated_r,updated_g,updated_b} = same_values(r,g,b)
         updated_grid.append(f"{updated_r},{updated_g},{updated_b}")
     
     return jsonify({'grid': updated_grid})
+
+def same_values(r,g,b):
+    r1=r
+    b1=b
+    g1=g
+    return r1,b1,g1
+
+def gaussian_blur():
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
