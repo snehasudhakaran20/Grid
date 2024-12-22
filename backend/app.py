@@ -14,6 +14,16 @@ def calculate():
     return jsonify({'output': result})
 
 
+@app.route('/api/process-grid', methods=['POST'])
+def process_grid():
+    data = request.json
+    grid = data['grid']
+
+    # Process the grid using the previously provided algorithm
+    filled_grid = fill_missing_colors(grid)  # Call your grid processing function
+
+    return jsonify({"grid": filled_grid})
+
 
 
 
