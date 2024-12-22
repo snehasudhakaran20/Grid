@@ -6,8 +6,8 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for cross-origin requests
 
 
-@app.route('/api/run_algorithm', methods=['POST'])
-def run_algorithm():
+@app.route('/api/run_algorithm1', methods=['POST'])
+def run_algorithm1():
     data = request.json
     grid = data.get('grid', [])
     
@@ -29,13 +29,55 @@ def same_values(r,g,b):
     g1=g
     return r1,b1,g1
 
-def gaussian_blur():
+
+
+def amaze(grid):
+    # Placeholder: Replace with actual AMAZE logic
+    return [f"{int(r)//2},{int(g)//2},{int(b)//2}" for r, g, b in (rgb.split(",") for rgb in grid)]
+
+def ppg(grid):
+    # Placeholder: Replace with actual PPG logic
+    return [f"{int(r)*2%256},{int(g)*2%256},{int(b)*2%256}" for r, g, b in (rgb.split(",") for rgb in grid)]
+
+def vng(grid):
+    # Placeholder: Replace with actual VNG logic
+    return [f"{255-int(r)},{int(g)},{int(b)}" for r, g, b in (rgb.split(",") for rgb in grid)]
+
+def edge_detect(grid):
+    # Placeholder: Replace with actual Edge Detection logic
+    return [f"{max(0, int(r)-50)},{max(0, int(g)-50)},{max(0, int(b)-50)}" for r, g, b in (rgb.split(",") for rgb in grid)]
+
+@app.route('/run_algorithm', methods=['POST'])
+def run_algorithm():
     data = request.json
     grid = data.get('grid', [])
-    
-    if not grid:
-        return jsonify({'error': 'Invalid grid data'}), 400
+    algorithm = data.get('algorithm')
 
+    if not grid or not algorithm:
+        return jsonify({'error': 'Invalid input data'}), 400
+
+    # Select and execute the appropriate algorithm
+    if algorithm == "gaussian_blur":
+        updated_grid = gaussian_blur(grid)
+    elif algorithm == "amaze":
+        updated_grid = amaze(grid)
+    elif algorithm == "ppg":
+        updated_grid = ppg(grid)
+    elif algorithm == "vng":
+        updated_grid = vng(grid)
+    elif algorithm == "edge_detect":
+        updated_grid = edge_detect(grid)
+    else:
+        return jsonify({'error': 'Unknown algorithm'}), 400
+
+    return jsonify({'grid': updated_grid})
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+def gaussian_blur(grid):
     sigma=1
     kernel=gaussian_kernel(10,sigma)
     updated_grid=apply_gaussian_blur(grid,kernel)
