@@ -55,11 +55,40 @@
         button:hover {
             background-color: #0056b3;
         }
+        .small-icon {
+            padding: 5px;
+            font-size: 14px;
+            border-radius: 50%;
+            width: 60px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+        .small-icon:hover {
+            background-color: #e0e0e0;
+        }
         footer {
             margin-top: 20px;
             font-size: 14px;
             color: #777;
         }
+        .color-options {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .color-option {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+        }
+        .red { background-color: red; }
+        .green { background-color: green; }
+        .blue { background-color: blue; }
     </style>
 </head>
 <body>
@@ -69,17 +98,30 @@
     <div id="grid1" class="grid"></div>
     <div id="grid2" class="grid"></div>
 </div>
-<button id="reset">Reset Colors</button>
 <button id="run">Run Algorithm</button>
+<div>
+    <button id="resetGrid1" class="small-icon">Reset 1</button>
+    <button id="resetGrid2" class="small-icon">Reset 2</button>
+</div>
+<div class="color-options">
+    <div id="redOption" class="color-option red"></div>
+    <div id="greenOption" class="color-option green"></div>
+    <div id="blueOption" class="color-option blue"></div>
+</div>
 <footer>2024 &copy; SS</footer>
 
 <script>
     const grid1 = document.getElementById('grid1');
     const grid2 = document.getElementById('grid2');
-    const resetButton = document.getElementById('reset');
+    const resetGrid1Button = document.getElementById('resetGrid1');
+    const resetGrid2Button = document.getElementById('resetGrid2');
     const runButton = document.getElementById('run');
+    const redOption = document.getElementById('redOption');
+    const greenOption = document.getElementById('greenOption');
+    const blueOption = document.getElementById('blueOption');
 
     let selectedSquare = null;
+    let selectedColor = null;
 
     function createDropdown(square) {
         const dropdown = document.createElement('div');
@@ -122,6 +164,20 @@
                 square.addEventListener('click', (e) => {
                     e.stopPropagation();
 
+                    if (selectedColor) {
+                        if (selectedColor === 'red') {
+                            square.style.backgroundColor = 'rgb(255, 0, 0)';
+                            square.dataset.rgb = '255,0,0';
+                        } else if (selectedColor === 'green') {
+                            square.style.backgroundColor = 'rgb(0, 255, 0)';
+                            square.dataset.rgb = '0,255,0';
+                        } else if (selectedColor === 'blue') {
+                            square.style.backgroundColor = 'rgb(0, 0, 255)';
+                            square.dataset.rgb = '0,0,255';
+                        }
+                        return;
+                    }
+
                     if (selectedSquare && selectedSquare !== square) {
                         selectedSquare.querySelector('.dropdown').style.display = 'none';
                     }
@@ -147,10 +203,21 @@
             selectedSquare.querySelector('.dropdown').style.display = 'none';
             selectedSquare = null;
         }
+
+        if (!e.target.classList.contains('color-option')) {
+            selectedColor = null;
+        }
     });
 
-    resetButton.addEventListener('click', () => {
+    resetGrid1Button.addEventListener('click', () => {
         document.querySelectorAll('#grid1 .square').forEach(square => {
+            square.style.backgroundColor = 'white';
+            square.dataset.rgb = "255,255,255";
+        });
+    });
+
+    resetGrid2Button.addEventListener('click', () => {
+        document.querySelectorAll('#grid2 .square').forEach(square => {
             square.style.backgroundColor = 'white';
             square.dataset.rgb = "255,255,255";
         });
@@ -159,7 +226,7 @@
     runButton.addEventListener('click', async () => {
         const gridValues = Array.from(document.querySelectorAll('#grid1 .square')).map(square => square.dataset.rgb);
 
-        const response = await fetch('https://demosaicing-math.onrender.com/api/run_algorithm', {
+        const response = await fetch('/run_algorithm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ grid: gridValues })
@@ -173,6 +240,10 @@
             squares[index].style.backgroundColor = `rgb(${rgb})`;
         });
     });
+
+    redOption.addEventListener('click', () => selectedColor = 'red');
+    greenOption.addEventListener('click', () => selectedColor = 'green');
+    blueOption.addEventListener('click', () => selectedColor = 'blue');
 
     createGrid(grid1);
     createGrid(grid2, true);
