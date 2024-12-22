@@ -32,20 +32,29 @@ def same_values(r,g,b):
 
 
 def amaze(grid):
-    # Placeholder: Replace with actual AMAZE logic
-    return [f"{int(0)//2},{int(g)//2},{int(b)//2}" for r, g, b in (rgb.split(",") for rgb in grid)]
+    # 
+    return [{0,0,0} for r, g, b in (rgb.split(",") for rgb in grid)]
 
 def ppg(grid):
-    # Placeholder: Replace with actual PPG logic
-    return [f"{int(r)*2%256},{int(0)*2%256},{int(b)*2%256}" for r, g, b in (rgb.split(",") for rgb in grid)]
+      return [{0,0,255} for r, g, b in (rgb.split(",") for rgb in grid)] 
+   # return [f"{int(r)*2%256},{int(0)*2%256},{int(b)*2%256}" for r, g, b in (rgb.split(",") for rgb in grid)]
 
 def vng(grid):
-    # Placeholder: Replace with actual VNG logic
-    return [f"{255-int(r)},{int(g)},{int(0)}" for r, g, b in (rgb.split(",") for rgb in grid)]
+    return [{0,255,0} for r, g, b in (rgb.split(",") for rgb in grid)]
+
+    #return [f"{255-int(r)},{int(g)},{int(0)}" for r, g, b in (rgb.split(",") for rgb in grid)]
 
 def edge_detect(grid):
-    # Placeholder: Replace with actual Edge Detection logic
-    return [f"{max(0, int(0)-50)},{max(0, int(0)-50)},{max(0, int(0)-50)}" for r, g, b in (rgb.split(",") for rgb in grid)]
+    return [{255,0,0} for r, g, b in (rgb.split(",") for rgb in grid)]
+
+    #return [f"{max(0, int(0)-50)},{max(0, int(0)-50)},{max(0, int(0)-50)}" for r, g, b in (rgb.split(",") for rgb in grid)]
+
+def gaussian_blur(grid):
+    sigma=1
+    kernel=gaussian_kernel(10,sigma)
+    updated_grid=apply_gaussian_blur(grid,kernel)
+    
+    return jsonify({'grid': updated_grid})
 
 @app.route('/run_algorithm', methods=['POST'])
 def run_algorithm():
@@ -70,22 +79,7 @@ def run_algorithm():
     else:
         return jsonify({'error': 'Unknown algorithm'}), 400
 
-    return jsonify({'grid': updated_grid})
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
-def gaussian_blur(grid):
-    sigma=1
-    kernel=gaussian_kernel(10,sigma)
-    updated_grid=apply_gaussian_blur(grid,kernel)
-    
-    return jsonify({'grid': updated_grid})
-
-    
-    
+    return jsonify({'grid': updated_grid})   
 
 if __name__ == '__main__':
     app.run(debug=True)
