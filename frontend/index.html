@@ -26,25 +26,22 @@
       width: 50px;
       height: 50px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       border: 1px solid #ccc;
       cursor: pointer;
-      position: relative;
     }
 
     .cell select {
       display: none;
-      margin: 2px 0;
     }
 
     .cell.active select {
-      display: block;
+      display: inline;
     }
 
-    .selected {
-      border: 2px dashed blue;
+    .cell.active {
+      border: 2px solid #000;
     }
 
     button {
@@ -62,28 +59,20 @@
   </div>
   <button onclick="runAlgorithm()">Run Algorithm</button>
   <button onclick="resetGrid()">Reset</button>
-  <button onclick="copySelection()">Copy</button>
-  <button onclick="pasteSelection()">Paste</button>
 
   <script>
     const gridSize = 9;
     const originalGrid = document.getElementById("original-grid");
     const updatedGrid = document.getElementById("updated-grid");
-    let selectedCells = [];
-    let copiedValues = null;
 
-    function createDropdown(label) {
-      const wrapper = document.createElement("div");
+    function createDropdown() {
       const select = document.createElement("select");
-
-      [0, 31, 63, 127, 191, 255].forEach(value => {
+      for (let i = 0; i <= 255; i += 15) {
         const option = document.createElement("option");
-        option.value = value;
-        option.textContent = `${label}: ${value}`;
+        option.value = i;
+        option.textContent = i;
         select.appendChild(option);
-      });
-
-      wrapper.appendChild(select);
+      }
       return select;
     }
 
@@ -92,44 +81,21 @@
         const cell = document.createElement("div");
         cell.classList.add("cell");
 
-        const red = createDropdown("R");
-        const green = createDropdown("G");
-        const blue = createDropdown("B");
+        const red = createDropdown();
+        const green = createDropdown();
+        const blue = createDropdown();
 
         cell.appendChild(red);
         cell.appendChild(green);
         cell.appendChild(blue);
 
-        cell.addEventListener("click", (e) => {
-          e.stopPropagation();
-          document.querySelectorAll(".cell").forEach(c => c.classList.remove("active"));
-          cell.classList.add("active");
-          showDropdowns(cell);
-        });
-
-        cell.addEventListener("change", () => {
-          updateCellColor(cell);
+        cell.addEventListener('click', () => {
+          document.querySelectorAll('.cell').forEach(c => c.classList.remove('active'));
+          cell.classList.add('active');
         });
 
         container.appendChild(cell);
       }
-    }
-
-    function showDropdowns(cell) {
-      cell.querySelectorAll("select").forEach(select => select.style.display = "block");
-    }
-
-    function hideDropdowns() {
-      document.querySelectorAll(".cell select").forEach(select => select.style.display = "none");
-      document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("active"));
-    }
-
-    function updateCellColor(cell) {
-      const [red, green, blue] = cell.getElementsByTagName("select");
-      const r = parseInt(red.value);
-      const g = parseInt(green.value);
-      const b = parseInt(blue.value);
-      cell.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
     }
 
     createGrid(originalGrid);
@@ -145,42 +111,19 @@
         let g = parseInt(green.value);
         let b = parseInt(blue.value);
 
-        r = Math.min(r + 31, 255);
-        g = Math.min(g + 31, 255);
-        b = Math.min(b + 31, 255);
-#callpythonhere
+        r = Math.min(r + 30, 255);
+        g = Math.min(g + 30, 255);
+        b = Math.min(b + 30, 255);
+
         const updatedCell = updatedCells[i];
         updatedCell.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
       }
     }
 
     function resetGrid() {
-      document.querySelectorAll(".cell select").forEach(select => select.value = 0);
-      document.querySelectorAll(".cell").forEach(cell => cell.style.backgroundColor = "");
-      selectedCells = [];
+      document.querySelectorAll('.cell select').forEach(select => select.value = 0);
+      document.querySelectorAll('#updated-grid .cell').forEach(cell => cell.style.backgroundColor = '');
     }
-
-    function copySelection() {
-      if (selectedCells.length > 0) {
-        const [red, green, blue] = selectedCells[0].getElementsByTagName("select");
-        copiedValues = [red.value, green.value, blue.value];
-      }
-    }
-
-    function pasteSelection() {
-      if (copiedValues) {
-        selectedCells.forEach(cell => {
-          const [red, green, blue] = cell.getElementsByTagName("select");
-          red.value = copiedValues[0];
-          green.value = copiedValues[1];
-          blue.value = copiedValues[2];
-          updateCellColor(cell);
-        });
-      }
-    }
-
-    // Hide dropdowns when clicking outside a cell
-    document.addEventListener("click", hideDropdowns);
   </script>
 </body>
 </html>
