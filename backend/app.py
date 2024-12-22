@@ -40,7 +40,7 @@ def ppg(grid):
    # return [f"{int(r)*2%256},{int(0)*2%256},{int(b)*2%256}" for r, g, b in (rgb.split(",") for rgb in grid)]
 
 def vng(grid):
-    return [{0,255,0} for r, g, b in (rgb.split(",") for rgb in grid)]
+      return [{0,255,0} for r, g, b in (rgb.split(",") for rgb in grid)]
 
     #return [f"{255-int(r)},{int(g)},{int(0)}" for r, g, b in (rgb.split(",") for rgb in grid)]
 
