@@ -14,9 +14,9 @@ def run_algorithm():
     updated_grid = []
     for rgb in grid:
         r, g, b = map(int, rgb.split(','))
-        updated_r = 255 - r
-        updated_g = 255 - g
-        updated_b = 255 - b
+        updated_r = r
+        updated_g = g
+        updated_b = b
         updated_grid.append(f"{updated_r},{updated_g},{updated_b}")
     
     return jsonify({'grid': updated_grid})
