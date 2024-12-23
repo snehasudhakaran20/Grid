@@ -31,9 +31,6 @@ def same_values(r,g,b):
 
 
 
-def amaze(grid):
-    # 
-    return [{0,0,0} for r, g, b in (rgb.split(",") for rgb in grid)]
 
 def ppg(grid):
       return [{0,0,255} for r, g, b in (rgb.split(",") for rgb in grid)] 
@@ -69,7 +66,7 @@ def run_algorithm():
     if algorithm == "gaussian_blur":
         updated_grid = gaussian_blur(grid)
     elif algorithm == "amaze":
-        updated_grid = amaze(grid)
+        updated_grid = amaze_demosaic(grid)
     elif algorithm == "ppg":
         updated_grid = ppg(grid)
     elif algorithm == "vng":
