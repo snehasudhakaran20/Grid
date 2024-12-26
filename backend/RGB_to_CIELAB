@@ -15,3 +15,59 @@ b : blue to yellow axis
 Built in functions for all of above : skimage, colorspacious
 
 """
+
+import numpy as np
+
+def rgb_to_cielab(rgb):
+    """
+    Convert an RGB color to the CIE-LAB color space.
+
+    Parameters:
+    rgb (tuple): A tuple of (R, G, B) values in the range [0, 255].
+
+    Returns:
+    tuple: A tuple of (L, a, b) values in the CIE-LAB color space.
+    """
+    # Step 1: Normalize RGB values to [0, 1]
+    R, G, B = [x / 255.0 for x in rgb]
+
+    # Step 2: Gamma correction (linearization)
+    def gamma_correct(value):
+        return value / 12.92 if value <= 0.04045 else ((value + 0.055) / 1.055) ** 2.4
+
+    R_linear = gamma_correct(R)
+    G_linear = gamma_correct(G)
+    B_linear = gamma_correct(B)
+
+    # Step 3: Convert linear RGB to XYZ
+    # sRGB to XYZ conversion matrix (D65 illuminant)
+    rgb_to_xyz_matrix = np.array([
+        [0.4124564, 0.3575761, 0.1804375],
+        [0.2126729, 0.7151522, 0.0721750],
+        [0.0193339, 0.1191920, 0.9503041]
+    ])
+
+    rgb_linear = np.array([R_linear, G_linear, B_linear])
+    X, Y, Z = np.dot(rgb_to_xyz_matrix, rgb_linear)
+
+    # Step 4: Normalize XYZ values
+    X_n, Y_n, Z_n = 95.047, 100.000, 108.883  # Reference white (D65 illuminant)
+    X /= X_n
+    Y /= Y_n
+    Z /= Z_n
+
+    # Step 5: Apply the CIE-LAB transformation
+    def f(t):
+        return t ** (1/3) if t > 0.008856 else (7.787 * t + 16 / 116)
+
+    f_X = f(X)
+    f_Y = f(Y)
+    f_Z = f(Z)
+
+    # Step 6: Calculate L*, a*, b*
+    L = 116 * f_Y - 16
+    a = 500 * (f_X - f_Y)
+    b = 200 * (f_Y - f_Z)
+
+    return L, a, b
+
