@@ -1,0 +1,17 @@
+"""
+Algo : 
+Convert RGB to CIE-LAB
+1. normalize r,g,b, ie /255
+2. inverse gamma correction R`= F(R) ,  eq given
+3. multiple with the transformation matrix [XYZ] = [T][RGB] - standard values - need to see how they were derived
+4. Normalize XYZ with white values uding D65 luminant - ?
+5. Apply CIE lab transformation function fxyz
+6. Final step phew : calc L,A,B from the above results of fxyz
+
+L : luminant 0 - 100, dark to white
+a : green to magenta axis
+b : blue to yellow axis
+
+Built in functions for all of above : skimage, colorspacious
+
+"""
